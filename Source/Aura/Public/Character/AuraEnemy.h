@@ -21,6 +21,14 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+protected:
+	/**
+	 * Functions
+	 */
+
+	/* Ability System */
+	virtual void InitAbilityActorInfo() override;
+
 public:
 	/**
 	 * Variables

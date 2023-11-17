@@ -66,4 +66,12 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "WidgetController")
 	TObjectPtr<UAttributeSet> AttributeSet;
+
+public:
+	/**
+	 * Functions
+	 */
+
+	virtual void BroadcastInitialValues();
+	virtual void BindCallbacksToDependencies();
 };
