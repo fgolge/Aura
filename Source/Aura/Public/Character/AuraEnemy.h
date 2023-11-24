@@ -23,6 +23,13 @@ protected:
 
 protected:
 	/**
+	 * Variables
+	 */
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterClassDefaults")
+	int32 Level = 1;
+	
+	/**
 	 * Functions
 	 */
 
@@ -31,14 +38,13 @@ protected:
 
 public:
 	/**
-	 * Variables
-	 */
-
-	/**
 	 * Functions
 	 */
 
 	/* Enemy Interface */
 	virtual void HighlightActor() override;
 	virtual void UnhighlightActor() override;
+
+	/* Combat Interface */
+	virtual int32 GetPlayerLevel() override;
 };

@@ -25,4 +25,12 @@ protected:
 	 */
 
 	virtual void InitAbilityActorInfo() override;
+
+public:
+	/**
+	 * Functions
+	 */
+
+	/* Combat Interface */
+	virtual int32 GetPlayerLevel() override;
 };

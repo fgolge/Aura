@@ -40,8 +40,8 @@ private:
 	TObjectPtr<UInputAction> MoveAction;
 
 	/* UI */
-	TObjectPtr<IEnemyInterface> LastActor;
-	TObjectPtr<IEnemyInterface> ThisActor;
+	IEnemyInterface* LastActor;
+	IEnemyInterface* ThisActor;
 
 	/**
 	 * Functions
