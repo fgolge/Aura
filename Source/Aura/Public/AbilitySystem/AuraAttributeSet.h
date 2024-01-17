@@ -49,6 +49,13 @@ struct FEffectProperties
 	ACharacter* TargetCharacter = nullptr;
 };
 
+// Alias for functions returning FGameplayAttribute type pointer static delegate
+typedef TBaseStaticDelegateInstance<FGameplayAttribute(), FDefaultDelegateUserPolicy>::FFuncPtr FAttributeFuncPtr;
+
+// Alias for a template function pointer static delegate
+template <class T>
+using TStaticFuncPtr = typename TBaseStaticDelegateInstance<T, FDefaultDelegateUserPolicy>::FFuncPtr;
+
 /**
  * 
  */
@@ -73,6 +80,8 @@ public:
 	/**
 	 * Variables
 	 */
+
+	TMap<FGameplayTag, TStaticFuncPtr<FGameplayAttribute()>> TagsToAttributes;
 
 	/* Vital Attributes */
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category = "VitalAttributes")
