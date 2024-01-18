@@ -24,7 +24,7 @@ public:
 	virtual void BindCallbacksToDependencies() override;
 	virtual void BroadcastInitialValues() override;
 
-	UPROPERTY(BlueprintAssignable)
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
 	FAttributeInfoSignature AttributeInfoDelegate;
 
 protected:
