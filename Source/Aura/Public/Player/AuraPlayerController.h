@@ -4,12 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "InputActionValue.h"
+#include "GameplayTagContainer.h"
 #include "GameFramework/PlayerController.h"
 #include "AuraPlayerController.generated.h"
 
+struct FGameplayTag;
+class UAuraInputConfig;
 class UInputAction;
 class UInputMappingContext;
 class IEnemyInterface;
+class UAuraAbilitySystemComponent;
+class USplineComponent;
 
 /**
  * 
@@ -36,10 +41,36 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputMappingContext> AuraContext;
 
-	UPROPERTY(EditAnywhere, Category="Input")
+	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> MoveAction;
 
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputAction> ShiftAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UAuraInputConfig> InputConfig;
+
+	bool bShiftKeyDown = false;
+
+	/* Movement */
+	FVector CachedDestination = FVector::ZeroVector;
+	float FollowTime = 0.f;
+	float ShortPressThreshold = 0.5f;
+	bool bAutoRunning = false;
+	bool bTargeting = false;
+
+	UPROPERTY(EditDefaultsOnly)
+	float AutoRunAcceptanceRadius = 50.f;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USplineComponent> Spline;
+
+	/* Gameplay Ability System */
+	UPROPERTY()
+	TObjectPtr<UAuraAbilitySystemComponent> AuraAbilitySystemComponent;
+
 	/* UI */
+	FHitResult CursorHit;
 	IEnemyInterface* LastActor;
 	IEnemyInterface* ThisActor;
 
@@ -49,6 +80,17 @@ private:
 
 	/* Input Callbacks */
 	void Move(const FInputActionValue& InputActionValue);
+	void AbilityInputTagPressed(FGameplayTag InputTag);
+	void AbilityInputTagReleased(FGameplayTag InputTag);
+	void AbilityInputTagHeld(FGameplayTag InputTag);
+	void ShiftPressed() { bShiftKeyDown = true; };
+	void ShiftReleased() { bShiftKeyDown = false; };
+
+	/* Movement */
+	void AutoRun();
+
+	/* Gameplay Ability System */
+	UAuraAbilitySystemComponent* GetASC();
 
 	/* UI */
 	void CursorTrace();

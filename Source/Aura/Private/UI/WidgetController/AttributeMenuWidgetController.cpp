@@ -31,7 +31,8 @@ void UAttributeMenuWidgetController::BroadcastInitialValues()
 
 void UAttributeMenuWidgetController::BroadcastAttributeInfo(const FAuraAttributeInfo& Info) const
 {
-	FAuraAttributeInfo NewInfo = AttributeInfo->FindAttributeInfoForTag(Info.AttributeTag);
+	FAuraAttributeInfo NewInfo = Info;
 	NewInfo.AttributeValue = Info.AttributeGetter.GetNumericValue(AttributeSet);
 	AttributeInfoDelegate.Broadcast(NewInfo);
 }
+
