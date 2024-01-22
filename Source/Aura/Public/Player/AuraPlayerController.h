@@ -8,6 +8,7 @@
 #include "GameFramework/PlayerController.h"
 #include "AuraPlayerController.generated.h"
 
+class UDamageTextComponent;
 struct FGameplayTag;
 class UAuraInputConfig;
 class UInputAction;
@@ -74,6 +75,9 @@ private:
 	IEnemyInterface* LastActor;
 	IEnemyInterface* ThisActor;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UDamageTextComponent> DamageTextComponentClass;
+
 	/**
 	 * Functions
 	 */
@@ -94,4 +98,14 @@ private:
 
 	/* UI */
 	void CursorTrace();
+
+public:
+	/**
+	 * Functions
+	 */
+
+	/* UI */
+
+	UFUNCTION(Client, Reliable)
+	void ShowDamageNumber(ACharacter* TargetCharacter, float DamageAmount);
 };

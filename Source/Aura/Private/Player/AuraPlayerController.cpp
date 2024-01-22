@@ -10,8 +10,10 @@
 #include "NavigationSystem.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "Components/SplineComponent.h"
+#include "GameFramework/Character.h"
 #include "Input/AuraInputComponent.h"
 #include "Interaction/EnemyInterface.h"
+#include "UI/Widget/DamageTextComponent.h"
 
 AAuraPlayerController::AAuraPlayerController()
 {
@@ -198,5 +200,18 @@ void AAuraPlayerController::CursorTrace()
 	{
 		if (LastActor) LastActor->UnhighlightActor();
 		if (ThisActor) ThisActor->HighlightActor();
+	}
+}
+
+void AAuraPlayerController::ShowDamageNumber_Implementation(ACharacter* TargetCharacter, float DamageAmount)
+{
+	if (IsValid(TargetCharacter) && DamageTextComponentClass)
+	{
+		UDamageTextComponent* DamageText = NewObject<UDamageTextComponent>(TargetCharacter, DamageTextComponentClass);
+		DamageText->RegisterComponent();
+		DamageText->AttachToComponent(TargetCharacter->GetRootComponent(),
+		                              FAttachmentTransformRules::KeepRelativeTransform); 
+		DamageText->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);			// We attach and detach because we don't want it to move with the target
+		DamageText->SetDamageText(DamageAmount);
 	}
 }
