@@ -107,5 +107,5 @@ public:
 	/* UI */
 
 	UFUNCTION(Client, Reliable)
-	void ShowDamageNumber(ACharacter* TargetCharacter, float DamageAmount);
+	void ShowDamageNumber(ACharacter* TargetCharacter, float DamageAmount, bool bCriticalHit, bool bBlockedHit);
 };
