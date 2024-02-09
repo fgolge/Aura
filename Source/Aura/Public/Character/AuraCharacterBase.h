@@ -52,10 +52,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	FName WeaponTipSocketName;
-	
+
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	FName RightHandSocketName;
-	
+
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	FName LeftHandSocketName;
 
@@ -69,6 +69,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
 	USoundBase* DeathSound;
+
+	/* Minions */
+	int32 MinionCount = 0;
 
 	/* Ability System */
 	UPROPERTY()
@@ -125,7 +128,7 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TArray<FTaggedMontage> AttackMontages;
-	
+
 	/**
 	 * Functions
 	 */
@@ -147,4 +150,6 @@ public:
 	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() override;
 	virtual UNiagaraSystem* GetBloodEffect_Implementation() override;
 	virtual FTaggedMontage GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
+	virtual int32 GetMinionCount_Implementation() override;
+	virtual void AddToMinionCount_Implementation(const int32 Amount = 1) override;
 };

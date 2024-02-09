@@ -98,7 +98,7 @@ private:
 
 	/* UI */
 	void CursorTrace();
-
+	
 public:
 	/**
 	 * Functions

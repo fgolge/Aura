@@ -80,7 +80,7 @@ FVector AAuraCharacterBase::GetCombatSocketLocation_Implementation(const FGamepl
 	{
 		return GetMesh()->GetSocketLocation(TailSocketName);
 	}
-	
+
 	return FVector();
 }
 
@@ -131,9 +131,9 @@ UNiagaraSystem* AAuraCharacterBase::GetBloodEffect_Implementation()
 
 FTaggedMontage AAuraCharacterBase::GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag)
 {
-	for(FTaggedMontage TaggedMontage : AttackMontages)
+	for (FTaggedMontage TaggedMontage : AttackMontages)
 	{
-		if(TaggedMontage.MontageTag == MontageTag)
+		if (TaggedMontage.MontageTag == MontageTag)
 		{
 			return TaggedMontage;
 		}
@@ -141,12 +141,22 @@ FTaggedMontage AAuraCharacterBase::GetTaggedMontageByTag_Implementation(const FG
 	return FTaggedMontage();
 }
 
+int32 AAuraCharacterBase::GetMinionCount_Implementation()
+{
+	return MinionCount;
+}
+
+void AAuraCharacterBase::AddToMinionCount_Implementation(const int32 Amount)
+{
+	MinionCount += Amount;
+}
+
 void AAuraCharacterBase::MulticastHandleDeath_Implementation()
 {
 	bDead = true;
 
 	UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation(), GetActorRotation());
-	
+
 	Weapon->SetSimulatePhysics(true);
 	Weapon->SetEnableGravity(true);
 	Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
