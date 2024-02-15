@@ -7,6 +7,8 @@
 #include "AuraAbilitySystemComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTags, const FGameplayTagContainer& /* Asset Tags */);
+DECLARE_MULTICAST_DELEGATE_OneParam(FAbilitiesGiven, UAuraAbilitySystemComponent*);
+DECLARE_DELEGATE_OneParam(FForEachAbility, const FGameplayAbilitySpec&)
 
 /**
  * 
@@ -24,6 +26,8 @@ protected:
 	UFUNCTION(Client, Reliable)
 	void ClientEffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec,
 	                   FActiveGameplayEffectHandle EffectHandle);
+	virtual void OnRep_ActivateAbilities() override;
+	
 
 public:
 	/**
@@ -31,6 +35,8 @@ public:
 	 */
 
 	FEffectAssetTags EffectAssetTags;
+	FAbilitiesGiven AbilitiesGivenDelegate;
+	bool bStartupAbilitiesGiven = false;
 
 	/**
 	 * Functions
@@ -39,7 +45,12 @@ public:
 	/* Input */
 	void AbilityInputTagHeld(const FGameplayTag& InputTag);
 	void AbilityInputTagReleased(const FGameplayTag& InputTag);
-	
+
+	/* Ability System */
 	void AbilityActorInfoSet();
 	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities);
+	void ForEachAbility(const FForEachAbility& Delegate);
+
+	static FGameplayTag GetAbilityTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
+	static FGameplayTag GetInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
 };

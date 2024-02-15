@@ -8,6 +8,8 @@
 #include "UI/WidgetController/AuraWidgetController.h"
 #include "OverlayWidgetController.generated.h"
 
+struct FAuraAbilityInfo;
+
 USTRUCT(BlueprintType)
 struct FUIWidgetRow : public FTableRowBase
 {
@@ -27,11 +29,16 @@ struct FUIWidgetRow : public FTableRowBase
 };
 
 class UAuraUserWidget;
+class UAbilityInfo;
+class UAuraAbilitySystemComponent;
+
 struct FOnAttributeChangeData;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageWidgetRowSignature, FUIWidgetRow, Row);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityInfoSignature, const FAuraAbilityInfo&, Info);
 
 /**
  * 
@@ -48,6 +55,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category ="WidgetData")
 	TObjectPtr<UDataTable> MessageWidgetDataTable;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category ="WidgetData")
+	TObjectPtr<UAbilityInfo> AbilityInfo;
 
 	/**
 	 * Functions
@@ -76,6 +86,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Messages")
 	FMessageWidgetRowSignature MessageWidgetRowDelegate;
 
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Abilities")
+	FAbilityInfoSignature AbilityInfoDelegate;
+
 	/**
 	 * Functions
 	 */
@@ -83,6 +96,8 @@ public:
 	/* Callbacks */
 	virtual void BroadcastInitialValues() override;
 	virtual void BindCallbacksToDependencies() override;
+
+	void OnInitializaStartupAbilities(UAuraAbilitySystemComponent* AuraAbilitySystemComponent);
 };
 
 template <typename T>

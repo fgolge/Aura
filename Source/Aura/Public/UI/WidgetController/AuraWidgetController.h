@@ -3,10 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "AuraWidgetController.generated.h"
 
-class UAuraAttributeSet;
 class UAttributeSet;
 class UAbilitySystemComponent;
 
