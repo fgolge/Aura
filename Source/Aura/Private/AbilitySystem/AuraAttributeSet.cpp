@@ -10,7 +10,9 @@
 #include "Net/UnrealNetwork.h"
 #include "AuraGameplayTags.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
+#include "Aura/AuraLogChannels.h"
 #include "Interaction/CombatInterface.h"
+#include "Interaction/PlayerInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/AuraPlayerController.h"
 
@@ -84,9 +86,6 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
 		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
-
-		UE_LOG(LogTemp, Warning, TEXT("Changed Health on %s, Health: %f"), *Properties.TargetAvatarActor->GetName(),
-		       GetHealth());
 	}
 
 	if (Data.EvaluatedData.Attribute == GetManaAttribute())
@@ -111,6 +110,7 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 				{
 					CombatInterface->Die();
 				}
+				SendXPEvent(Properties);
 			}
 			else
 			{
@@ -122,6 +122,43 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			ShowFloatingText(Properties, LocalIncomingDamage,
 			                 UAuraAbilitySystemLibrary::IsCriticalHit(Properties.EffectContextHandle),
 			                 UAuraAbilitySystemLibrary::IsBlockedHit(Properties.EffectContextHandle));
+		}
+	}
+
+	if (Data.EvaluatedData.Attribute == GetIncomingXPAttribute())
+	{
+		if (GetIncomingXP() >= 0.f)
+		{
+			const float LocalIncomingXP = GetIncomingXP();
+			SetIncomingXP(0.f);
+
+			if (Properties.SourceCharacter->Implements<UPlayerInterface>() && Properties.SourceCharacter->Implements<
+				UCombatInterface>())
+			{
+				const int32 CurrentLevel = ICombatInterface::Execute_GetPlayerLevel(Properties.SourceCharacter);
+				const int32 CurrentXP = IPlayerInterface::Execute_GetXP(Properties.SourceCharacter);
+
+				const int32 NewLevel = IPlayerInterface::Execute_FindLevelForXP(
+					Properties.SourceCharacter, CurrentXP + LocalIncomingXP);
+				const int32 NumLevelUps = NewLevel - CurrentLevel;
+
+				if (NumLevelUps > 0)
+				{
+					const int32 AttributePointsReward = IPlayerInterface::Execute_GetAttributePointsReward(
+						Properties.SourceCharacter, CurrentLevel);
+					const int32 SpellPointsReward = IPlayerInterface::Execute_GetSpellPointsReward(
+						Properties.SourceCharacter, CurrentLevel);
+					IPlayerInterface::Execute_AddToPlayerLevel(Properties.SourceCharacter, NumLevelUps);
+					IPlayerInterface::Execute_AddToAttributePoints(Properties.SourceCharacter, AttributePointsReward);
+					IPlayerInterface::Execute_AddToSpellPoints(Properties.SourceCharacter, SpellPointsReward);
+					SetHealth(GetMaxHealth());
+					SetMana(GetMaxMana());
+
+					IPlayerInterface::Execute_LevelUp(Properties.SourceCharacter);
+				}
+
+				IPlayerInterface::Execute_AddToXP(Properties.SourceCharacter, LocalIncomingXP);
+			}
 		}
 	}
 }
@@ -161,6 +198,26 @@ void UAuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 	}
 }
 
+void UAuraAttributeSet::SendXPEvent(const FEffectProperties Props)
+{
+	if (Props.TargetCharacter->Implements<UCombatInterface>())
+	{
+		const int32 TargetLevel = ICombatInterface::Execute_GetPlayerLevel(Props.TargetCharacter);
+		const ECharacterClass TargetClass = ICombatInterface::Execute_GetCharacterClass(Props.TargetCharacter);
+		const int32 XPReward = UAuraAbilitySystemLibrary::GetXPRewardForClassAndLevel(
+			Props.TargetCharacter, TargetClass, TargetLevel);
+
+		const FAuraGameplayTags& GameplayTags = FAuraGameplayTags::Get();
+		FGameplayEventData Payload;
+
+		Payload.EventTag = GameplayTags.Attributes_Meta_IncomingXP;
+		Payload.EventMagnitude = XPReward;
+
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Props.SourceCharacter,
+		                                                         GameplayTags.Attributes_Meta_IncomingXP, Payload);
+	}
+}
+
 void UAuraAttributeSet::ShowFloatingText(const FEffectProperties& Properties, const float Damage, bool bCriticalHit,
                                          bool bBlockedHit) const
 {
@@ -171,7 +228,7 @@ void UAuraAttributeSet::ShowFloatingText(const FEffectProperties& Properties, co
 			AuraPC->ShowDamageNumber(Properties.TargetCharacter, Damage, bCriticalHit, bBlockedHit);
 			return;
 		}
-		if(AAuraPlayerController* AuraPC = Cast<AAuraPlayerController>(Properties.TargetCharacter->Controller))
+		if (AAuraPlayerController* AuraPC = Cast<AAuraPlayerController>(Properties.TargetCharacter->Controller))
 		{
 			AuraPC->ShowDamageNumber(Properties.TargetCharacter, Damage, bCriticalHit, bBlockedHit);
 		}

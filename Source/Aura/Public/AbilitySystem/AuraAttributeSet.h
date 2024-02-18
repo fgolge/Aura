@@ -76,6 +76,7 @@ private:
 	 */
 
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Properties) const;
+	void SendXPEvent(const FEffectProperties Props);
 
 public:
 	/**
@@ -169,9 +170,14 @@ public:
 	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, PhysicalResistance);
 
 	/* Meta Attributes */
+
 	UPROPERTY(BlueprintReadOnly, Category = "MetaAttributes")
 	FGameplayAttributeData IncomingDamage;
 	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, IncomingDamage);
+
+	UPROPERTY(BlueprintReadOnly, Category = "MetaAttributes")
+	FGameplayAttributeData IncomingXP;
+	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, IncomingXP);
 
 	
 	/**
