@@ -8,8 +8,6 @@
 #include "UI/WidgetController/AuraWidgetController.h"
 #include "OverlayWidgetController.generated.h"
 
-struct FAuraAbilityInfo;
-
 USTRUCT(BlueprintType)
 struct FUIWidgetRow : public FTableRowBase
 {
@@ -38,8 +36,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float,
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageWidgetRowSignature, FUIWidgetRow, Row);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityInfoSignature, const FAuraAbilityInfo&, Info);
-
 /**
  * 
  */
@@ -56,9 +52,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category ="WidgetData")
 	TObjectPtr<UDataTable> MessageWidgetDataTable;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category ="WidgetData")
-	TObjectPtr<UAbilityInfo> AbilityInfo;
-
 	/**
 	 * Functions
 	 */
@@ -66,9 +59,10 @@ protected:
 	template <typename T>
 	T* GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag& Tag);
 	
-	void OnInitializaStartupAbilities(UAuraAbilitySystemComponent* AuraAbilitySystemComponent);
+	void OnXPChanged(int32 NewXP);
 
-	void OnXPChanged(int32 NewXP) const;
+	void OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& SlotTag,
+						   const FGameplayTag& PreviousSlotTag, const FGameplayTag& StatusTag) const;
 
 public:
 	/**
@@ -89,9 +83,6 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Messages")
 	FMessageWidgetRowSignature MessageWidgetRowDelegate;
-
-	UPROPERTY(BlueprintAssignable, Category = "GAS|Abilities")
-	FAbilityInfoSignature AbilityInfoDelegate;
 	
 	UPROPERTY(BlueprintAssignable, Category = "GAS|XP")
 	FOnAttributeChangedSignature OnXPPercentChangedDelegate;

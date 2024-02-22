@@ -69,8 +69,17 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	void ShowFloatingText(const FEffectProperties& Properties, float Damage, bool bCriticalHit, bool bBlockedHit) const;
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
 
 private:
+	/**
+	 * Variables
+	 */
+
+	// to check if the change occurs on MaxHealth and MaxMana attributes are due to a level up 
+	bool bTopOffHealth{false};
+	bool bTopOffMana{false};
+
 	/**
 	 * Functions
 	 */
@@ -179,7 +188,7 @@ public:
 	FGameplayAttributeData IncomingXP;
 	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, IncomingXP);
 
-	
+
 	/**
 	 * Functions
 	 */

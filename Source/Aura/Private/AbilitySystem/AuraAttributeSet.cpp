@@ -10,10 +10,8 @@
 #include "Net/UnrealNetwork.h"
 #include "AuraGameplayTags.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
-#include "Aura/AuraLogChannels.h"
 #include "Interaction/CombatInterface.h"
 #include "Interaction/PlayerInterface.h"
-#include "Kismet/GameplayStatics.h"
 #include "Player/AuraPlayerController.h"
 
 UAuraAttributeSet::UAuraAttributeSet()
@@ -148,11 +146,13 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 						Properties.SourceCharacter, CurrentLevel);
 					const int32 SpellPointsReward = IPlayerInterface::Execute_GetSpellPointsReward(
 						Properties.SourceCharacter, CurrentLevel);
+
 					IPlayerInterface::Execute_AddToPlayerLevel(Properties.SourceCharacter, NumLevelUps);
 					IPlayerInterface::Execute_AddToAttributePoints(Properties.SourceCharacter, AttributePointsReward);
 					IPlayerInterface::Execute_AddToSpellPoints(Properties.SourceCharacter, SpellPointsReward);
-					SetHealth(GetMaxHealth());
-					SetMana(GetMaxMana());
+
+					bTopOffHealth = true;
+					bTopOffMana = true;
 
 					IPlayerInterface::Execute_LevelUp(Properties.SourceCharacter);
 				}
@@ -160,6 +160,23 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 				IPlayerInterface::Execute_AddToXP(Properties.SourceCharacter, LocalIncomingXP);
 			}
 		}
+	}
+}
+
+void UAuraAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
+{
+	Super::PostAttributeChange(Attribute, OldValue, NewValue);
+
+	if (Attribute == GetMaxHealthAttribute() && bTopOffHealth)
+	{
+		SetHealth(GetMaxHealth());
+		bTopOffHealth = false;
+	}
+
+	if (Attribute == GetMaxManaAttribute() && bTopOffMana)
+	{
+		SetMana(GetMaxMana());
+		bTopOffMana = false;
 	}
 }
 
